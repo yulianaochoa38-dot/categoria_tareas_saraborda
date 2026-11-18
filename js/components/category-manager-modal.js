@@ -1,5 +1,5 @@
-import { EVENTS } from "../shared/constants";
-const CSS_URL = new URL('../styles/category-manager-modal.css', import.meta.url).href;
+import { EVENTS } from '../shared/constants.js';
+const CSS_URL = new URL('../../css/category-manager-modal.css', import.meta.url).href;
 const CLOSE_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>';
 
 // Elemento con foco real, atravesando los Shadow DOM (para devolver el foco al cerrar)

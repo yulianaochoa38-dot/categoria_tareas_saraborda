@@ -72,11 +72,12 @@ class TaskFormModal extends HTMLElement {
                     </div>
 
                     <div class="campo">
-                        <div class="campo">
-                            <label> for="categoria">Categoría</label>
-                            <select id="categoria" name="categoria">
-                            <p class="ayuda">Opcional. puedes crear una nueva categoría en el boton de "categorias".</p>
-                        </div>
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria" name="categoria"></select>
+                        <p class="ayuda">Opcional. Puedes crear categorías con el botón «Categorías».</p>
+                    </div>
+
+                    <div class="campo">
                         <label for="fecha">Fecha de registro</label>
                         <div class="con-icono">
                             <input type="text" id="fecha" readonly aria-describedby="ayuda-fecha">
@@ -232,5 +233,3 @@ class TaskFormModal extends HTMLElement {
 }
 
 customElements.define('task-form-modal', TaskFormModal);
-
-// javascript

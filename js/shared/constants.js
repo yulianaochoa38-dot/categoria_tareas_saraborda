@@ -18,7 +18,6 @@ export const API_STATUS = {
     OK: 'ok',
     ERROR: 'error'
 };
- 
 export const EVENTS = {
     SAVE: 'task:save',
     EDIT: 'task:edit',
@@ -30,8 +29,6 @@ export const EVENTS = {
     IMPORT: 'task:import',
     FILTER: 'task:filter',
     SEARCH: 'task:search',
-    API_RETRY: 'task:api-retry',
-    CATEGORY_SAVE: 'category:save',
     API_RETRY: 'task:api-retry',
     CATEGORY_SAVE: 'category:save',
     CATEGORY_DELETE: 'category:delete'

@@ -10,7 +10,6 @@ let tasks = [];
 
 /* ---------- Persistencia ---------- */
 
-// Comprueba que un objeto tenga la forma del contrato
 function isValidTask(t) {
     return (
         t !== null &&
@@ -20,8 +19,9 @@ function isValidTask(t) {
         (typeof t.description === 'undefined' || typeof t.description === 'string') &&
         typeof t.createdAt === 'string' &&
         typeof t.completed === 'boolean' &&
+        (t.origin === TASK_ORIGIN.LOCAL || t.origin === TASK_ORIGIN.API) &&
         (t.sourceId === null || typeof t.sourceId === 'number') &&
-        (typeof t.categoryId === 'undefined' || typeof t.categoryId === 'string')
+        (typeof t.categoryId === 'undefined' || t.categoryId === null || typeof t.categoryId === 'string')
     );
 }
 
@@ -98,7 +98,7 @@ export function addTask({ title, description = '', completed, categoryId = null 
     return commit([...tasks, task], { ok: true, data: { ...task } });
 }
 
-export function updateTask(id, { title, description, completed, categoryId = null } = {}) {
+export function updateTask(id, { title, description, completed, categoryId } = {}) {
     const current = tasks.find((t) => t.id === id);
     if (!current) return { ok: false, message: 'La tarea no existe.' };
 

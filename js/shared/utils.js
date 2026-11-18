@@ -11,7 +11,7 @@ export function generateId() {
 }
 
 // Crear tarea local
-export function createLocalTask({ title, description = '', completed = false }) {
+export function createLocalTask({ title, description = '', completed = false, categoryId = null }) {
     return {
         id: generateId(),
         title: title.trim(),

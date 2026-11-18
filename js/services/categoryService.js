@@ -2,7 +2,7 @@
 // Proporciona funciones para cargar, agregar, actualizar y eliminar categorías, así como para validar nombres y generar identificadores únicos.
 // Se asegura de que los cambios se guarden correctamente y maneja errores de persistencia.
 
-import {CATEGORY_ORIGIN} from '../shared/constants.js';
+import { CATEGORY_STORAGE_KEY } from '../shared/constants.js';
 const MAX_NAME_LENGTH = 40;
 let categories = [];
 
@@ -124,6 +124,6 @@ export function deleteCategory(id) {
     }
     return commit(
         categories.filter((c) => c.id !== id),
-        { ok: true, deletedId: id }
+        { ok: true, deletedId: 1 }
     )
 }
