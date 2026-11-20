@@ -26,7 +26,8 @@ import {
     deleteTask,
     completeAll,
     clearTasks,
-    importTasks
+    importTasks,
+    removeCategoryFromTasks
 } from './services/taskService.js';
 
 import {
