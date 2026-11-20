@@ -52,6 +52,11 @@ class TaskImportModal extends HTMLElement {
                         </button>
                     </div>
 
+                    <div class="category-field">
+                        <label for="categorySelect">Categoría de las tareas importadas</label>
+                        <select id="categorySelect"></select>
+                    </div>
+
                     <footer class="modal-footer">
                         <span id="selectedCount">0 seleccionadas</span>
                         <div>
@@ -60,11 +65,7 @@ class TaskImportModal extends HTMLElement {
                                 Importar seleccionadas
                             </button>
                         </div>
-                        <div class="category-field">
-                            <label for="categorySelect">Categoría de las tareas importadas</label>
-                            <select id="categorySelect"></select>
-                        </div>
-                    </footer class="modal-footer">
+                    </footer>
                 </section>
             </div>
         `;
