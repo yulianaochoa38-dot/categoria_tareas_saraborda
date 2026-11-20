@@ -75,6 +75,10 @@ class TaskApp extends HTMLElement {
                         ↓ Importar
                     </button>
 
+                    <button id="btnCategorias" class="btn-secondary">
+                        Categorías
+                    </button>
+
                 </section>
 
                 <section class="list-actions">
@@ -99,6 +103,8 @@ class TaskApp extends HTMLElement {
                 <task-detail-modal></task-detail-modal>
 
                 <task-import-modal></task-import-modal>
+
+                <category-manager-modal></category-manager-modal>
 
             </main>
         `;
@@ -128,6 +134,12 @@ class TaskApp extends HTMLElement {
                     modal.open();
                 }
             });
+
+        // Abrir el administrador de categorías
+        this.shadowRoot.querySelector('#btnCategorias')
+            .addEventListener('click', () => {
+                this.shadowRoot.querySelector('category-manager-modal').open();
+            });    
 
         // Marcar todas las tareas locales como completadas
         this.shadowRoot.querySelector('#btnCompleteAll')
@@ -261,6 +273,32 @@ class TaskApp extends HTMLElement {
 
         if (modal && typeof modal.setApiTasks === 'function') {
             modal.setApiTasks(this._apiTasks);
+        }
+
+    }
+
+        // Enviar las categorías a los tres componentes que las usan
+    setCategories(categories) {
+
+        const list = Array.isArray(categories) ? categories : [];
+
+        ['task-form-modal', 'task-import-modal', 'category-manager-modal']
+            .forEach((tag) => {
+                const modal = this.shadowRoot.querySelector(tag);
+                if (modal && typeof modal.setCategories === 'function') {
+                    modal.setCategories(list);
+                }
+            });
+
+    }
+
+    // Mostrar un error de categoría dentro del administrador
+    showCategoryError(message) {
+
+        const modal = this.shadowRoot.querySelector('category-manager-modal');
+
+        if (modal && typeof modal.showError === 'function') {
+            modal.showError(message);
         }
 
     }

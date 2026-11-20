@@ -221,7 +221,8 @@ class TaskFormModal extends HTMLElement {
                     id: this._task ? this._task.id : null,
                     title,
                     description,
-                    completed: root.getElementById('completada').checked
+                    completed: root.getElementById('completada').checked,
+                    categoryId: root.getElementById('categoria').value || null
                 },
                 bubbles: true,
                 composed: true

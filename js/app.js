@@ -14,6 +14,7 @@ import './components/task-form-modal.js';
 import './components/task-import-modal.js';
 import './components/task-app.js';
 import './components/task-detail-modal.js';
+import './components/category-manager-modal.js';
 
 // Importar servicios
 import {
@@ -28,9 +29,18 @@ import {
     importTasks
 } from './services/taskService.js';
 
+import {
+    loadCategories,
+    getCategories,
+    addCategory,
+    updateCategory,
+    deleteCategory
+} from './services/categoryService.js';
+
 import { filterTasks } from './services/filterService.js';
 import { getApiTasks } from './services/apiService.js';
 import { mapSelectedApiTasks } from './services/importService.js';
+import './components/category-manager-modal.js';
 
 // Obtener el componente principal
 const app = document.querySelector('task-app');
@@ -52,6 +62,33 @@ function getImportedSourceIds(tasks) {
         });
 
 }
+// Si la categoría ya no existe, la tarea queda sin categoría (null)
+function validCategoryId(categoryId) {
+
+    const exists = getCategories().some(function (category) {
+        return category.id === categoryId;
+    });
+
+    return exists ? categoryId : null;
+
+}
+
+// Agrega a cada tarea el nombre de su categoría, para mostrarlo en pantalla
+function withCategoryName(tasks) {
+
+    const categories = getCategories();
+
+    return tasks.map(function (task) {
+
+        const category = categories.find(function (item) {
+            return item.id === task.categoryId;
+        });
+
+        return { ...task, categoryName: category ? category.name : '' };
+
+    });
+
+}
 
 // Actualizar la lista, el progreso y las tareas importadas
 function refreshView() {
@@ -68,7 +105,8 @@ function refreshView() {
     currentFilter !== TASK_STATUS.ALL ||
     currentSearch.trim() !== '';
 
-    app.setTasks(filteredTasks, isFiltered);
+    app.setCategories(getCategories());
+    app.setTasks(withCategoryName(filteredTasks), isFiltered);
     app.setSummary(allTasks);
     app.setImportedIds(getImportedSourceIds(allTasks));
 
@@ -124,7 +162,7 @@ async function loadApiTasks() {
 // Crear o actualizar una tarea
 app.addEventListener(EVENTS.SAVE, function (event) {
 
-    const { id, title, description, completed } = event.detail;
+    const { id, title, description, completed, categoryId } = event.detail;
 
     let resultado;
 
@@ -133,7 +171,8 @@ app.addEventListener(EVENTS.SAVE, function (event) {
         resultado = addTask({
             title: title,
             description: description,
-            completed: completed
+            completed: completed,
+            categoryId: validCategoryId(categoryId)
         });
 
         showResult(resultado, 'Tarea creada correctamente.');
@@ -143,7 +182,8 @@ app.addEventListener(EVENTS.SAVE, function (event) {
         resultado = updateTask(id, {
             title: title,
             description: description,
-            completed: completed
+            completed: completed,
+            categoryId: validCategoryId(categoryId)
         });
 
         showResult(resultado, 'Tarea actualizada correctamente.');
@@ -166,7 +206,7 @@ app.addEventListener(EVENTS.DETAIL, function (event) {
         return;
     }
 
-    app.openDetail(task);
+    app.openDetail(withCategoryName([task])[0]);
 
 });
 // Abrir el formulario para crear o editar
@@ -303,8 +343,10 @@ app.addEventListener(EVENTS.IMPORT, function (event) {
             return;
         }
 
-        // Convertirlas al formato de nuestra aplicación
-        const normalizedTasks = mapSelectedApiTasks(selectedTasks);
+        const normalizedTasks = mapSelectedApiTasks(
+            selectedTasks,
+            validCategoryId(event.detail.categoryId)
+        );
 
         // Enviar las tareas convertidas al servicio de almacenamiento
         const resultado = importTasks(normalizedTasks);
@@ -348,6 +390,51 @@ app.addEventListener(EVENTS.IMPORT, function (event) {
 
 });
 
+// Crear o renombrar una categoría
+app.addEventListener(EVENTS.CATEGORY_SAVE, function (event) {
+
+    const { id, name } = event.detail;
+
+    const resultado = (id === null || id === undefined)
+        ? addCategory(name)
+        : updateCategory(id, name);
+
+    if (!resultado.ok) {
+        app.showCategoryError(resultado.message);
+        return;
+    }
+
+    refreshView();
+
+    app.showMessage(
+        id ? 'Categoría actualizada correctamente.' : 'Categoría creada correctamente.',
+        'success'
+    );
+
+});
+
+// Eliminar una categoría (las tareas que la usaban quedan sin categoría)
+app.addEventListener(EVENTS.CATEGORY_DELETE, function (event) {
+
+    const resultado = deleteCategory(event.detail.id);
+
+    if (!resultado.ok) {
+        app.showCategoryError(resultado.message);
+        return;
+    }
+
+    const limpieza = removeCategoryFromTasks(event.detail.id);
+
+    if (!limpieza.ok) {
+        app.showMessage(limpieza.message, 'error');
+    }
+
+    refreshView();
+
+    app.showMessage('Categoría eliminada correctamente.', 'success');
+
+});
+
 // Reintentar la consulta de la API
 app.addEventListener(EVENTS.API_RETRY, function () {
 
@@ -361,11 +448,14 @@ console.log('API configurada:', API_URL);
 
 // Recuperar las tareas guardadas
 const loadResult = loadSavedTasks();
+const categoriesResult = loadCategories();
 
 refreshView();
 
 if (!loadResult.ok) {
     app.showMessage(loadResult.message, 'error');
+} else if (!categoriesResult.ok) {
+    app.showMessage(categoriesResult.message, 'error');
 }
 
 // Consultar el banco de tareas

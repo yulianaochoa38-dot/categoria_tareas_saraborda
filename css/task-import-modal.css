@@ -242,3 +242,42 @@ button:disabled {
         min-width: 150px;
     }
 }
+
+.category-field {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 25px 0;
+}
+
+.category-field label {
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.category-field select {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    background-color: var(--color-superficie);
+    color: var(--color-texto);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.category-field select:focus-visible {
+    outline: 3px solid rgba(83, 105, 223, 0.3);
+    outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+    .category-field {
+        padding: 12px 16px 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+}

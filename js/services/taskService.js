@@ -219,5 +219,5 @@ export function removeCategoryFromTasks(categoryId) {
     });
 
     if (updatedCount === 0) return { ok: true, updated: 0 };
-    return commit(next, { ok: true, updated: updatedCount });
+    return commit(next, { ok: true, updated: updatedCount }); 
 }

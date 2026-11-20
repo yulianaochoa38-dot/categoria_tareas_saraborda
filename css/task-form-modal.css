@@ -103,6 +103,24 @@ textarea {
     resize: vertical;
 }
 
+select {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 0.9rem;
+    border: 1px solid var(--color-borde, #dce2ea);
+    border-radius: var(--radio, 10px);
+    background: var(--color-superficie, #ffffff);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+select:focus {
+    border-color: var(--color-primario, #5369df);
+    outline: 2px solid var(--color-primario, #5369df);
+    outline-offset: 0;
+}
+
 textarea:focus {
     border-color: var(--color-primario, #5369df);
     outline: 2px solid var(--color-primario, #5369df);

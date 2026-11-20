@@ -11,6 +11,7 @@ class TaskImportModal extends HTMLElement {
         this._status = API_STATUS.LOADING;
         this._statusMessage = 'Cargando tareas...';
         this._search = '';
+        this._categories = [];
     }
 
     connectedCallback() {
@@ -59,10 +60,15 @@ class TaskImportModal extends HTMLElement {
                                 Importar seleccionadas
                             </button>
                         </div>
-                    </footer>
+                        <div class="category-field">
+                            <label for="categorySelect">Categoría de las tareas importadas</label>
+                            <select id="categorySelect"></select>
+                        </div>
+                    </footer class="modal-footer">
                 </section>
             </div>
         `;
+        this.fillCategories('');
         this.updateView();
     }
 
@@ -153,6 +159,33 @@ class TaskImportModal extends HTMLElement {
         });
     }
 
+        // Recibe las categorías existentes y llena la lista desplegable
+    setCategories(categories) {
+        this._categories = Array.isArray(categories) ? categories : [];
+        const select = this.shadowRoot.querySelector('#categorySelect');
+        this.fillCategories(select ? select.value : '');
+    }
+
+    fillCategories(selectedId = '') {
+        const select = this.shadowRoot.querySelector('#categorySelect');
+        if (!select) return;
+        select.innerHTML = '';
+
+        const none = document.createElement('option');
+        none.value = '';
+        none.textContent = 'Sin categoría';
+        select.appendChild(none);
+
+        for (const category of this._categories) {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            select.appendChild(option);
+        }
+
+        select.value = this._categories.some((c) => c.id === selectedId) ? selectedId : '';
+    }
+    
     open() {
         this._selectedIds = [];
         this.shadowRoot.querySelector('#overlay').hidden = false;
@@ -297,7 +330,8 @@ class TaskImportModal extends HTMLElement {
 
         this.dispatchEvent(new CustomEvent(EVENTS.IMPORT, {
             detail: {
-                sourceIds: [...this._selectedIds]
+                sourceIds: [...this._selectedIds],
+                categoryId: this.shadowRoot.querySelector('#categorySelect').value || null
             },
             bubbles: true,
             composed: true

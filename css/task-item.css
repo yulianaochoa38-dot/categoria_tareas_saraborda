@@ -43,6 +43,23 @@
     overflow-wrap: anywhere;
 }
 
+.categoria {
+    flex: none;
+    max-width: 140px;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: #eef1fd;
+    color: #3b4ab0;
+    font-size: 0.78rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.categoria[hidden] {
+    display: none;
+}
+
 .completada .titulo {
     text-decoration: line-through;
     color: var(--suave);
@@ -164,6 +181,10 @@
         grid-area: tarea;
         align-items: flex-start;
         gap: 12px;
+    }
+
+    .tarea {
+        flex-wrap: wrap;
     }
 
     .titulo {

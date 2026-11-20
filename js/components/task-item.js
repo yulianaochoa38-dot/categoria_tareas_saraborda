@@ -74,6 +74,7 @@ class TaskItem extends HTMLElement {
                     <input type="checkbox" class="check" data-accion="toggle"
                         ${task.completed ? 'checked' : ''} ${isApi ? 'disabled' : ''}>
                     <span class="titulo"></span>
+                    <span class="categoria" hidden></span>
                 </div>
                 <div class="celda fecha"></div>
                 <div class="celda estado">
@@ -105,6 +106,13 @@ class TaskItem extends HTMLElement {
         const root = this.shadowRoot;
         root.querySelector('.titulo').textContent = task.title;
         root.querySelector('.fecha').textContent = formatDate(task.createdAt);
+
+        // Etiqueta de categoría (task.categoryName la agrega el controlador)
+        const categoryTag = root.querySelector('.categoria');
+        if (task.categoryName) {
+            categoryTag.textContent = task.categoryName;
+            categoryTag.hidden = false;
+        }
 
         // Etiquetas accesibles descriptivas
         const checkbox = root.querySelector('.check');

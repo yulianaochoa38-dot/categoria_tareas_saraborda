@@ -83,6 +83,11 @@ class TaskDetailModal extends HTMLElement {
                     </div>
 
                     <div class="campo">
+                        <span class="etiqueta">Categoría</span>
+                        <p id="categoria-tarea"></p>
+                    </div>                    
+
+                    <div class="campo">
                         <span class="etiqueta">Descripción</span>
                         <p id="descripcion-tarea"></p>
                     </div>
@@ -159,6 +164,10 @@ class TaskDetailModal extends HTMLElement {
 
         // Mostrar el título
         root.getElementById('titulo-tarea').textContent = task.title;
+
+        // Mostrar la categoría (task.categoryName la agrega el controlador)
+        root.getElementById('categoria-tarea').textContent =
+            task.categoryName || 'Sin categoría';
 
         // Mostrar la descripción
         const description = root.getElementById('descripcion-tarea');
