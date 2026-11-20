@@ -53,6 +53,8 @@ No se utilizan frameworks, gestores de paquetes ni procesos de compilación.
 | **Descripción** | Permite agregar una descripción de hasta 1000 caracteres para explicar la tarea. |
 | **Editar tareas** | Permite modificar el título, la descripción y el estado de las tareas locales. La fecha de registro se conserva. |
 | **Consultar detalles** | El botón **Ver** abre una ventana con el título, la descripción, la fecha de registro, el estado y el origen de la tarea. Está disponible tanto para tareas locales como importadas. |
+| **Categorías** | Permite crear, renombrar y eliminar categorías desde el botón **Categorías**. Los nombres no pueden estar vacíos ni repetirse. |
+| **Asignar categoría** | La categoría se elige al crear o editar una tarea y al importar tareas desde la API. Se muestra junto al título y en la vista de detalles. |
 | **Completar tareas** | Permite marcar una tarea local como completada o pendiente desde su casilla. |
 | **Marcar todas** | Completa las tareas locales que aún están pendientes. Las tareas importadas no se modifican. |
 | **Eliminar tareas** | Permite eliminar una tarea individual con confirmación. |
@@ -64,8 +66,10 @@ No se utilizan frameworks, gestores de paquetes ni procesos de compilación.
 | **Control de duplicados** | Las tareas que ya fueron importadas se identifican y no pueden seleccionarse nuevamente. |
 | **Tareas importadas de solo lectura** | Se pueden consultar y eliminar, pero no editar ni cambiar de estado. |
 | **Persistencia** | Las tareas permanecen guardadas al recargar la página o volver a abrirla en el mismo navegador. |
-| **Compatibilidad con datos anteriores** | Las tareas que se guardaron antes de incorporar el campo de descripción se conservan y reciben una descripción vacía al cargarse. |
+| **Compatibilidad con datos anteriores** | Las tareas guardadas antes de incorporar la descripción o la categoría se conservan; al cargarse reciben una descripción vacía y quedan sin categoría. |
+| **Eliminar categorías** | Al eliminar una categoría, sus tareas no se borran: quedan como «Sin categoría». |
 | **Estados y mensajes** | La interfaz informa cuando la lista está vacía, una búsqueda no obtiene resultados o la consulta a la API falla. |
+
 
 ---
 
@@ -73,18 +77,21 @@ No se utilizan frameworks, gestores de paquetes ni procesos de compilación.
 
 1. **Crear una tarea:** selecciona **Nueva tarea**, escribe el título y, si lo necesitas, agrega una descripción. Puedes marcar la opción para crearla como completada. Después pulsa **Guardar tarea**.
 2. **Consultar detalles:** pulsa **Ver** en la fila de cualquier tarea para consultar su título, descripción, fecha, estado y origen.
-3. **Editar una tarea local:** utiliza el botón **Editar**, modifica el título, la descripción o el estado y guarda los cambios. La fecha de registro original se conserva.
-4. **Completar o reabrir una tarea:** utiliza la casilla que aparece junto al título. Esta acción está disponible para tareas locales.
-5. **Eliminar una tarea:** pulsa **Eliminar** y confirma la operación.
-6. **Importar tareas:** pulsa **Importar**, espera a que se cargue el banco de tareas, busca o selecciona las tareas que necesites y pulsa **Importar seleccionadas**.
-7. **Seleccionar todas las disponibles:** utiliza la casilla de selección general del modal. La selección se aplica a las tareas visibles que todavía no se han importado.
-8. **Buscar y filtrar:** escribe en el campo de búsqueda o selecciona **Todas**, **Pendientes** o **Completadas** en el filtro.
-9. **Marcar todas:** utiliza esta acción para completar las tareas locales pendientes.
-10. **Vaciar lista:** pulsa **Vaciar lista** y confirma. Se eliminan las tareas locales y las importadas.
+3. **Administrar categorías:** pulsa **Categorías**, escribe un nombre y pulsa **Agregar**. Usa **Renombrar** o **Eliminar** en cada categoría para cambiarla o quitarla.
+4. **Asignar una categoría:** elige una en el campo **Categoría** al crear o editar una tarea. Si no eliges ninguna, queda como «Sin categoría».
+5. **Editar una tarea local:** utiliza el botón **Editar**, modifica el título, la descripción o el estado y guarda los cambios. La fecha de registro original se conserva.
+6. **Completar o reabrir una tarea:** utiliza la casilla que aparece junto al título. Esta acción está disponible para tareas locales.
+7. **Eliminar una tarea:** pulsa **Eliminar** y confirma la operación.
+8. **Importar tareas:** pulsa **Importar**, espera a que se cargue el banco de tareas, busca o selecciona las tareas que necesites y antes de pulsar **Importar seleccionadas**, elige la categoría para las tareas que vas a importar.
+9. **Seleccionar todas las disponibles:** utiliza la casilla de selección general del modal. La selección se aplica a las tareas visibles que todavía no se han importado.
+10. **Buscar y filtrar:** escribe en el campo de búsqueda o selecciona **Todas**, **Pendientes** o **Completadas** en el filtro.
+11. **Marcar todas:** utiliza esta acción para completar las tareas locales pendientes.
+12. **Vaciar lista:** pulsa **Vaciar lista** y confirma. Se eliminan las tareas locales y las importadas.
 
 ### Reglas para las tareas importadas
 
 Las tareas importadas conservan el estado recibido desde la API. No se pueden editar ni cambiar entre pendientes y completadas. La interfaz deshabilita esas acciones y `taskService.js` también valida esta regla. Sí se pueden consultar desde **Ver** y eliminar.
+La categoría de una tarea importada se elige al importarla y no se puede cambiar después.
 
 JSONPlaceholder no proporciona un campo de descripción para sus tareas. Por eso, al consultar una tarea importada, la ventana de detalles muestra una nota que explica que la API no entrega una descripción.
 
@@ -147,7 +154,8 @@ Proyecto_Javascript/
 │   ├── task-item.css
 │   ├── task-form-modal.css
 │   ├── task-detail-modal.css
-│   └── task-import-modal.css
+│   ├── task-import-modal.css
+│   └── category-manager-modal.css
 ├── js/
 │   ├── app.js
 │   ├── shared/
@@ -155,6 +163,7 @@ Proyecto_Javascript/
 │   │   └── utils.js
 │   ├── services/
 │   │   ├── taskService.js
+│   │   ├── categoryService.js
 │   │   ├── filterService.js
 │   │   ├── apiService.js
 │   │   └── importService.js
@@ -164,7 +173,8 @@ Proyecto_Javascript/
 │       ├── task-item.js
 │       ├── task-form-modal.js
 │       ├── task-detail-modal.js
-│       └── task-import-modal.js
+│       ├── task-import-modal.js
+│       └── category-manager-modal.js
 └── wireframes/
     ├── escritorio.png
     ├── modal-formulario.png
@@ -187,16 +197,18 @@ Proyecto_Javascript/
 | `js/app.js` | Controlador de la aplicación. Registra los componentes, escucha eventos y coordina los servicios. |
 | `js/shared/constants.js` | Define la clave de almacenamiento, la URL de la API, los estados, los orígenes y los nombres de eventos. |
 | `js/shared/utils.js` | Genera identificadores y crea objetos de tareas locales e importadas. |
-| `js/services/taskService.js` | Administra el arreglo de tareas, las operaciones CRUD, la importación, la validación y la persistencia. |
+| `js/services/taskService.js` | Administra el arreglo de tareas, las operaciones CRUD, la importación, la validación y la persistencia, también quita una categoría eliminada de las tareas que la usaban. | |
 | `js/services/filterService.js` | Filtra las tareas por estado y realiza la búsqueda por título. |
 | `js/services/apiService.js` | Consulta la API de JSONPlaceholder y devuelve los datos o un mensaje de error. |
 | `js/services/importService.js` | Convierte las tareas seleccionadas de la API al formato interno de la aplicación. |
+| `js/services/categoryService.js` | Administra las categorías: crear, renombrar, eliminar, validar nombres y guardarlas. |
+| `js/components/category-manager-modal.js` | Ventana para crear, renombrar y eliminar categorías. |
 | `js/components/task-app.js` | Construye la pantalla principal y expone métodos para actualizar la interfaz y abrir los modales. |
 | `js/components/task-list.js` | Muestra la lista, sus encabezados y los estados vacíos. |
 | `js/components/task-item.js` | Representa una tarea y muestra las acciones permitidas según su origen. |
 | `js/components/task-form-modal.js` | Contiene el formulario modal para crear o editar tareas locales, incluido el campo de descripción. |
 | `js/components/task-detail-modal.js` | Muestra en modo de consulta la información completa de una tarea. |
-| `js/components/task-import-modal.js` | Muestra el banco de tareas de la API y permite seleccionar las que se importarán. |
+| `js/components/task-import-modal.js` | Muestra el banco de tareas de la API y permite seleccionar las que se importarán y su categoria. |
 | `css/` | Contiene los estilos generales y los estilos propios de cada componente. |
 | `wireframes/` | Guarda los wireframes y las evidencias del diseño inicial. |
 
@@ -216,6 +228,7 @@ Componentes Web
     app.js  ───────────────► Servicios
       ▲                         │
       │                         ├── taskService.js
+      │                         ├── categoryService.js
       │                         ├── filterService.js
       │                         ├── apiService.js
       │                         └── importService.js
@@ -240,6 +253,7 @@ La aplicación utiliza seis componentes personalizados:
 | `<task-form-modal>` | Formulario para crear o editar tareas locales. |
 | `<task-detail-modal>` | Ventana de solo lectura para consultar los detalles de una tarea. |
 | `<task-import-modal>` | Selección de tareas disponibles en la API. |
+| `<category-manager-modal>` | Ventana para crear, renombrar y eliminar categorías. |
 
 Cada componente extiende `HTMLElement`, crea su propio Shadow DOM con `attachShadow({ mode: 'open' })` y carga su hoja de estilos correspondiente. Esto permite encapsular la estructura y los estilos de los componentes.
 
@@ -251,7 +265,9 @@ La estructura principal de componentes es la siguiente:
   │     └── <task-item> (uno por tarea)
   ├── <task-form-modal>
   ├── <task-detail-modal>
+  ├── <category-manager-modal>
   └── <task-import-modal>
+
 ```
 
 ### Comunicación mediante eventos
@@ -267,10 +283,12 @@ Los componentes emiten eventos `CustomEvent` con `bubbles: true` y `composed: tr
 | `task:delete` | `{ id }` | Elimina la tarea indicada. |
 | `task:clear` | Sin datos adicionales | Solicita confirmación y vacía la lista. |
 | `task:complete-all` | Sin datos adicionales | Completa las tareas locales pendientes. |
-| `task:import` | `{ sourceIds: [...] }` | Busca, transforma e importa las tareas seleccionadas. |
+| `task:import` | `{ sourceIds: [...], categoryId }` | Busca, transforma e importa las tareas seleccionadas con la categoría elegida. |seleccionadas. |
 | `task:filter` | `{ status }` | Actualiza el filtro de estado. |
 | `task:search` | `{ query }` | Actualiza la búsqueda por título. |
 | `task:api-retry` | Sin datos adicionales | Vuelve a consultar la API. |
+| `category:save` | `{ id, name }` | Crea una categoría (si `id` es `null`) o la renombra. |
+| `category:delete` | `{ id }` | Elimina la categoría y deja sin categoría a sus tareas. |
 
 ### Servicios
 
@@ -278,6 +296,7 @@ Los componentes emiten eventos `CustomEvent` con `bubbles: true` y `composed: tr
 - **`filterService.js`** recibe las tareas, el estado seleccionado y el texto de búsqueda. Devuelve una lista filtrada sin modificar los datos originales. La búsqueda se realiza por título e ignora mayúsculas y tildes.
 - **`apiService.js`** consulta la dirección de JSONPlaceholder definida en `constants.js`, comprueba que la respuesta HTTP sea correcta y verifica que el resultado sea un arreglo.
 - **`importService.js`** convierte las tareas seleccionadas de la API al formato interno de la aplicación.
+- **`categoryService.js`** administra el arreglo de categorías y sus operaciones de creación, cambio de nombre, eliminación y persistencia. Valida que el nombre no esté vacío, no pase de 40 caracteres ni se repita (sin importar mayúsculas ni tildes).
 
 ---
 
@@ -293,7 +312,8 @@ Todas las tareas utilizan la misma estructura, independientemente de si fueron c
     createdAt: "2026-11-09T18:00:00.000Z",
     completed: false,
     origin: "local",
-    sourceId: null
+    sourceId: null,
+    categoryId: "cat-<identificador-unico>"
 }
 ```
 
@@ -306,6 +326,7 @@ Todas las tareas utilizan la misma estructura, independientemente de si fueron c
 | `completed` | Indica si la tarea está completada (`true`) o pendiente (`false`). |
 | `origin` | Identifica si la tarea es `local` o `api`. |
 | `sourceId` | Identificador numérico original de JSONPlaceholder. Para las tareas locales su valor es `null`. |
+| `categoryId` | Identificador de la categoría de la tarea. Es `null` si no tiene categoría. |
 
 ### Persistencia en localStorage
 
@@ -315,6 +336,10 @@ Todas las tareas utilizan la misma estructura, independientemente de si fueron c
 - Cada operación que modifica las tareas intenta guardar el nuevo arreglo.
 - Si el almacenamiento falla, `taskService.js` revierte el cambio y devuelve un resultado de error.
 - Los componentes no acceden directamente al almacenamiento; toda la persistencia se gestiona desde `taskService.js`.
+- Las categorías se guardan como JSON bajo la clave `proyecto-categorias-v1`, separada de la de las tareas.
+- Cada tarea guarda solo el `id` de su categoría. Al renombrar una categoría, todas sus tareas muestran el nombre nuevo.
+- Al eliminar una categoría, sus tareas pasan a `categoryId: null`.
+- Las tareas guardadas antes de agregar `categoryId` se cargan sin categoría.
 
 El almacenamiento es local al navegador y al dispositivo. No existe una cuenta de usuario ni sincronización entre distintos dispositivos.
 
@@ -331,9 +356,9 @@ El proceso de importación funciona así:
 1. Al iniciar la aplicación, `app.js` solicita las tareas mediante `getApiTasks()`.
 2. El modal comunica si la consulta está cargando, terminó correctamente o presentó un error.
 3. El usuario puede buscar dentro del banco y seleccionar una o varias tareas disponibles.
-4. El modal emite `task:import` con los identificadores originales (`sourceIds`) seleccionados.
+4. El modal emite `task:import` con los identificadores originales (`sourceIds`) y la categoría elegida (`categoryId`).
 5. `app.js` localiza las tareas originales y llama a `mapSelectedApiTasks()`.
-6. `importService.js` crea los objetos internos con un identificador propio, `origin: "api"` y el identificador original en `sourceId`.
+6. `importService.js` crea los objetos internos con un identificador propio, `origin: "api"` y el identificador original en `sourceId`y la categoría elegida (`categoryId`).
 7. `taskService.js` incorpora las tareas y omite las que ya existían para evitar duplicados.
 8. La lista, el progreso y los identificadores importados se actualizan.
 
@@ -350,6 +375,7 @@ Si la consulta no puede completarse, el modal muestra el mensaje recibido del se
 ## Experiencia de usuario y accesibilidad
 
 - La interfaz muestra mensajes cuando no existen tareas o cuando una búsqueda no devuelve coincidencias.
+- Los modales de formulario, detalles y categorías utilizan el elemento `<dialog>` y permiten cerrar la ventana con sus controles, pulsando `Esc` o haciendo clic fuera de ella.
 - El formulario y la vista de detalles utilizan el elemento `<dialog>` y permiten cerrar la ventana con sus controles, pulsando `Esc` o haciendo clic fuera de ella.
 - El formulario utiliza etiquetas asociadas a los campos y mensajes de validación para el título.
 - La vista de detalles presenta la información en modo de solo lectura; no modifica los datos de la tarea.
@@ -360,6 +386,7 @@ Si la consulta no puede completarse, el modal muestra el mensaje recibido del se
 - Las acciones de eliminación y vaciado solicitan confirmación antes de ejecutarse.
 - Los modales de formulario y detalles devuelven el foco al elemento que los abrió al cerrarse.
 - Los títulos y las descripciones de las tareas se insertan mediante `textContent`, en lugar de interpretarse como HTML.
+- Los botones de la ventana de categorías incluyen nombres accesibles, como «Renombrar categoría: Estudio», y los nombres se insertan con `textContent`.
 
 ---
 
@@ -420,6 +447,13 @@ Durante la revisión de la aplicación se comprobaron manualmente los siguientes
 | Modificar una tarea importada | La edición y el cambio de estado no están disponibles. |
 | Error al consultar la API | Se informa el problema y se ofrece la opción de reintentar. |
 | Diseño responsivo | La presentación cambia entre tabla de escritorio y tarjetas en tablet y móvil. |
+| Crear una categoría | Se agrega a la lista de categorías y aparece en los formularios. |
+| Crear una categoría vacía o repetida | Se rechaza y se muestra un mensaje de error. |
+| Renombrar una categoría | Sus tareas muestran el nombre nuevo. |
+| Crear o editar una tarea con categoría | La categoría aparece junto al título y en los detalles. |
+| Importar tareas con categoría | Todas las tareas importadas quedan con la categoría elegida. |
+| Eliminar una categoría con tareas | Las tareas se conservan y quedan como «Sin categoría». |
+| Recargar con categorías creadas | Las categorías y las categorías de las tareas permanecen guardadas. |
 
 ---
 
@@ -431,6 +465,9 @@ Durante la revisión de la aplicación se comprobaron manualmente los siguientes
 - **Tareas importadas de solo lectura:** no pueden editarse ni cambiar de estado, aunque sí se pueden consultar y eliminar.
 - **Sin descripción en la API:** JSONPlaceholder no entrega una descripción para sus tareas; la aplicación muestra una nota aclaratoria en la vista de detalles.
 - **Sin backend:** la aplicación no utiliza servidor propio, base de datos ni autenticación.
+- **Categorías locales:** se guardan en el navegador, igual que las tareas, y no se comparten entre dispositivos.
+- **Categoría de tareas importadas:** se elige al importar y no se puede cambiar después, porque las tareas importadas son de solo lectura.
+- **Una categoría por tarea:** una tarea pertenece a una sola categoría.
 
 ---
 
@@ -443,7 +480,7 @@ El desarrollo se distribuyó en dos áreas y se integró utilizando Git y ramas 
 | **Sara Yuliana Borda Ochoa** | Gestión de tareas y listado | `taskService.js`, `filterService.js`, `task-list.js`, `task-item.js`, `task-form-modal.js` y sus estilos. |
 | **Michael Daniel Martinez Buenahora** | API e integración de la aplicación | `apiService.js`, `importService.js`, `task-app.js`, `task-import-modal.js`, `app.js`, `index.html`, `global.css` y sus estilos. |
 
-Las funciones compartidas y los eventos se coordinaron para mantener un mismo formato de tarea y una comunicación consistente entre componentes y servicios. La vista de detalles y su integración se incorporaron como parte de la ampliación del proyecto.
+Las funciones compartidas y los eventos se coordinaron para mantener un mismo formato de tarea y una comunicación consistente entre componentes y servicios. La vista de detalles y su integración se incorporaron como parte de la ampliación del proyecto, la función de categorías se incorporó después como una ampliación del proyecto.
 
 ---
 
